@@ -127,3 +127,7 @@ without manually writing every test case from scratch.
 ---
 
 *Built with ❤️ using CrewAI + Groq + Gradio*
+
+
+<img width="1336" height="690" alt="image" src="https://github.com/user-attachments/assets/7d866e89-e903-43ee-a8b2-28fc5fd3f93c" />
+

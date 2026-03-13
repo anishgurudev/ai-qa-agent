@@ -16,13 +16,21 @@ if not GROQ_API_KEY:
 # ✅ Use crewai.LLM instead of langchain_groq.ChatGroq
 from crewai import LLM
 
+# groq_llm = LLM(
+#     model="groq/llama-3.3-70b-versatile",
+#     api_key=GROQ_API_KEY,
+#     temperature=0.7,
+#     max_tokens=2000,
+#     timeout=120,
+#     max_retries=3,
+
 groq_llm = LLM(
-    model="groq/llama-3.3-70b-versatile",
-    api_key=GROQ_API_KEY,
+    model="ollama/llama3.2",              # ✅ runs locally, zero cost
+    # model="ollama/llama3.1:8b",   # Much better quality & speed
+    base_url="http://localhost:11434",    # Ollama default port
     temperature=0.7,
-    max_tokens=2000,
-    timeout=120,
-    max_retries=3,
+    max_tokens=1500,
+    timeout=7200,
 )
 
 # ── File Paths ─────────────────────────────────────────────────

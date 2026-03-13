@@ -16,28 +16,51 @@ def generate_test_cases(prd_text: str, history: list):
 
     # Show "working" message immediately
     history.append({"role": "user",      "content": f"📄 PRD submitted ({len(prd_text)} characters)"})
-    history.append({"role": "assistant", "content": "⏳ Agents are working... This takes ~60 seconds.\n\n🔍 Agent 1 → Analyzing PRD\n🧪 Agent 2 → Designing test cases\n📊 Agent 3 → Writing Excel file"})
+    history.append({"role": "assistant", "content": "⏳ Agents are working... This takes ~few minutes .\n\n🔍 Agent 1 → Analyzing PRD\n🧪 Agent 2 → Designing test cases\n📊 Agent 3 → Writing Excel file"})
     yield history, None
 
     # Run the CrewAI pipeline
     try:
         result = run_crew(prd_text)
 
+        # ✅ Python writes Excel directly — no LLM tool needed
+        from tools.excel_tool import write_excel_tool
+        excel_result = write_excel_tool.run(result)
+
         if os.path.exists(EXCEL_PATH):
             response = (
                 f"✅ **Test cases generated successfully!**\n\n"
-                f"📊 **Agent Summary:**\n{result[:500]}{'...' if len(result) > 500 else ''}\n\n"
+                f"📊 {excel_result}\n\n"
                 f"📥 **Your Excel file is ready to download below.**"
             )
             history.append({"role": "assistant", "content": response})
             yield history, EXCEL_PATH
         else:
-            history.append({"role": "assistant", "content": f"⚠️ Crew finished but Excel not found.\n\nRaw output:\n{result}"})
+            history.append({"role": "assistant", "content": f"⚠️ {excel_result}\n\nRaw output:\n{result[:500]}"})
             yield history, None
 
     except Exception as e:
-        history.append({"role": "assistant", "content": f"❌ **Error:** {str(e)}\n\nCheck your GROQ_API_KEY in .env file."})
+        history.append({"role": "assistant", "content": f"❌ **Error:** {str(e)}"})
         yield history, None
+
+    # try:
+    #     result = run_crew(prd_text)
+    #
+    #     if os.path.exists(EXCEL_PATH):
+    #         response = (
+    #             f"✅ **Test cases generated successfully!**\n\n"
+    #             f"📊 **Agent Summary:**\n{result[:500]}{'...' if len(result) > 500 else ''}\n\n"
+    #             f"📥 **Your Excel file is ready to download below.**"
+    #         )
+    #         history.append({"role": "assistant", "content": response})
+    #         yield history, EXCEL_PATH
+    #     else:
+    #         history.append({"role": "assistant", "content": f"⚠️ Crew finished but Excel not found.\n\nRaw output:\n{result}"})
+    #         yield history, None
+    #
+    # except Exception as e:
+    #     history.append({"role": "assistant", "content": f"❌ **Error:** {str(e)}\n\nCheck your GROQ_API_KEY in .env file."})
+    #     yield history, None
 
 
 # ── Gradio UI ──────────────────────────────────────────────────
@@ -104,5 +127,5 @@ if __name__ == "__main__":
     print(f"📁 Excel output will be saved to: {EXCEL_PATH}")
     demo.launch(
         share=True,     # Creates a public URL for sharing with your QA team
-        show_error=True
+        show_error=True,
     )

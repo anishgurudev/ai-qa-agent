@@ -1,6 +1,6 @@
 # crew.py
 from crewai import Crew, Process
-from agents import prd_analyst, test_case_designer, excel_formatter
+from agents import prd_analyst, test_case_designer
 from tasks import create_tasks
 
 def run_crew(prd_text: str) -> str:
@@ -11,10 +11,12 @@ def run_crew(prd_text: str) -> str:
     tasks = create_tasks(prd_text)
 
     crew = Crew(
-        agents=[prd_analyst, test_case_designer, excel_formatter],
+        agents=[prd_analyst, test_case_designer],
         tasks=tasks,
         process=Process.sequential,  # Task 1 → Task 2 → Task 3 in order
-        verbose=True
+        verbose=True,
+        max_rpm = 25,  # ✅ Stay under the 30 RPM free limit
+        tracing=True  # ✅ Add this line
     )
 
     result = crew.kickoff()
